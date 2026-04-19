@@ -21,6 +21,8 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
+var version = "dev"
+
 const ethTypeEAPOL = 0x888e
 
 const (
@@ -164,6 +166,7 @@ func parseConfig(args []string) (Config, error) {
 	fs.SetOutput(os.Stderr)
 	fs.Usage = func() {
 		fmt.Fprintf(fs.Output(), "Usage: %s [options]\n\n", os.Args[0])
+		fmt.Fprintf(fs.Output(), "Version: %s\n\n", version)
 		fmt.Fprintln(fs.Output(), "Configuration priority: flags > environment variables > config file.")
 		fmt.Fprintln(fs.Output(), "Environment variables:")
 		fmt.Fprintln(fs.Output(), "  RUNJIE_CONFIG")

@@ -175,6 +175,14 @@ go run . -i "\\Device\\NPF_{YOUR-DEVICE-ID}" -m "12:34:56:78:9a:bc" -logout
 go build -o runjie-go.exe .
 ```
 
+### 自动发布
+
+仓库包含 GitHub Actions 工作流：
+
+- 推送 `v*` 标签时自动构建 Windows `amd64` / `arm64` 可执行文件
+- 自动把构建产物上传到对应 GitHub Release
+- 支持在 GitHub Actions 页面手动触发
+
 ### 格式化
 
 ```bash
