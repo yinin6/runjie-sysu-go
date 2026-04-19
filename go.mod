@@ -1,4 +1,4 @@
-module runjieTest
+module github.com/yinin6/ruijie-sysu-go
 
 go 1.25
 

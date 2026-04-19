@@ -169,18 +169,19 @@ func parseConfig(args []string) (Config, error) {
 		fmt.Fprintf(fs.Output(), "Version: %s\n\n", version)
 		fmt.Fprintln(fs.Output(), "Configuration priority: flags > environment variables > config file.")
 		fmt.Fprintln(fs.Output(), "Environment variables:")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_CONFIG")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_DEVICE_NAME")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_USERNAME")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_PASSWORD")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_IDENTITY")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_IDENTITY_SUFFIX_HEX")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_LOCAL_MAC")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_START_DELAY_MS")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_RETRY_DELAY_MS")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_KEEPALIVE_SEC")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_DEBUG")
-		fmt.Fprintln(fs.Output(), "  RUNJIE_ONLY_LOGIN")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_CONFIG")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_DEVICE_NAME")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_USERNAME")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_PASSWORD")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_IDENTITY")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_IDENTITY_SUFFIX_HEX")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_LOCAL_MAC")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_START_DELAY_MS")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_RETRY_DELAY_MS")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_KEEPALIVE_SEC")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_DEBUG")
+		fmt.Fprintln(fs.Output(), "  RUIJIE_ONLY_LOGIN")
+		fmt.Fprintln(fs.Output(), "Legacy aliases with RUNJIE_* are still supported.")
 		fmt.Fprintln(fs.Output(), "")
 		fs.PrintDefaults()
 	}
@@ -231,7 +232,7 @@ func detectConfigPath(args []string) string {
 			return strings.TrimPrefix(arg, "-config=")
 		}
 	}
-	return strings.TrimSpace(os.Getenv("RUNJIE_CONFIG"))
+	return lookupEnvValue("RUIJIE_CONFIG", "RUNJIE_CONFIG")
 }
 
 func loadConfigFile(path string) (ConfigPatch, error) {
@@ -251,37 +252,37 @@ func loadConfigFile(path string) (ConfigPatch, error) {
 func configFromEnv() ConfigPatch {
 	cfg := ConfigPatch{}
 
-	if v, ok := lookupStringEnv("RUNJIE_DEVICE_NAME"); ok {
+	if v, ok := lookupStringEnv("RUIJIE_DEVICE_NAME", "RUNJIE_DEVICE_NAME"); ok {
 		cfg.DeviceName = &v
 	}
-	if v, ok := lookupStringEnv("RUNJIE_USERNAME"); ok {
+	if v, ok := lookupStringEnv("RUIJIE_USERNAME", "RUNJIE_USERNAME"); ok {
 		cfg.Username = &v
 	}
-	if v, ok := lookupStringEnv("RUNJIE_PASSWORD"); ok {
+	if v, ok := lookupStringEnv("RUIJIE_PASSWORD", "RUNJIE_PASSWORD"); ok {
 		cfg.Password = &v
 	}
-	if v, ok := lookupStringEnv("RUNJIE_IDENTITY"); ok {
+	if v, ok := lookupStringEnv("RUIJIE_IDENTITY", "RUNJIE_IDENTITY"); ok {
 		cfg.Identity = &v
 	}
-	if v, ok := lookupStringEnv("RUNJIE_IDENTITY_SUFFIX_HEX"); ok {
+	if v, ok := lookupStringEnv("RUIJIE_IDENTITY_SUFFIX_HEX", "RUNJIE_IDENTITY_SUFFIX_HEX"); ok {
 		cfg.IdentitySuffixHex = &v
 	}
-	if v, ok := lookupStringEnv("RUNJIE_LOCAL_MAC"); ok {
+	if v, ok := lookupStringEnv("RUIJIE_LOCAL_MAC", "RUNJIE_LOCAL_MAC"); ok {
 		cfg.LocalMACStr = &v
 	}
-	if v, ok := lookupIntEnv("RUNJIE_START_DELAY_MS"); ok {
+	if v, ok := lookupIntEnv("RUIJIE_START_DELAY_MS", "RUNJIE_START_DELAY_MS"); ok {
 		cfg.StartDelayMs = &v
 	}
-	if v, ok := lookupIntEnv("RUNJIE_RETRY_DELAY_MS"); ok {
+	if v, ok := lookupIntEnv("RUIJIE_RETRY_DELAY_MS", "RUNJIE_RETRY_DELAY_MS"); ok {
 		cfg.RetryDelayMs = &v
 	}
-	if v, ok := lookupIntEnv("RUNJIE_KEEPALIVE_SEC"); ok {
+	if v, ok := lookupIntEnv("RUIJIE_KEEPALIVE_SEC", "RUNJIE_KEEPALIVE_SEC"); ok {
 		cfg.KeepaliveSec = &v
 	}
-	if v, ok := lookupBoolEnv("RUNJIE_DEBUG"); ok {
+	if v, ok := lookupBoolEnv("RUIJIE_DEBUG", "RUNJIE_DEBUG"); ok {
 		cfg.Debug = &v
 	}
-	if v, ok := lookupBoolEnv("RUNJIE_ONLY_LOGIN"); ok {
+	if v, ok := lookupBoolEnv("RUIJIE_ONLY_LOGIN", "RUNJIE_ONLY_LOGIN"); ok {
 		cfg.OnlyLogin = &v
 	}
 
@@ -325,42 +326,58 @@ func applyPatch(base Config, patch ConfigPatch) Config {
 	return base
 }
 
-func lookupStringEnv(key string) (string, bool) {
-	v, ok := os.LookupEnv(key)
-	if !ok {
-		return "", false
+func lookupEnvValue(keys ...string) string {
+	for _, key := range keys {
+		if v, ok := os.LookupEnv(key); ok {
+			return strings.TrimSpace(v)
+		}
 	}
-	return v, true
+	return ""
 }
 
-func lookupIntEnv(key string) (int, bool) {
-	v, ok := os.LookupEnv(key)
-	if !ok || strings.TrimSpace(v) == "" {
-		return 0, false
+func lookupStringEnv(keys ...string) (string, bool) {
+	for _, key := range keys {
+		v, ok := os.LookupEnv(key)
+		if ok {
+			return v, true
+		}
 	}
-
-	var out int
-	if _, err := fmt.Sscanf(v, "%d", &out); err != nil {
-		log.Fatalf("invalid integer in %s: %v", key, err)
-	}
-	return out, true
+	return "", false
 }
 
-func lookupBoolEnv(key string) (bool, bool) {
-	v, ok := os.LookupEnv(key)
-	if !ok || strings.TrimSpace(v) == "" {
-		return false, false
-	}
+func lookupIntEnv(keys ...string) (int, bool) {
+	for _, key := range keys {
+		v, ok := os.LookupEnv(key)
+		if !ok || strings.TrimSpace(v) == "" {
+			continue
+		}
 
-	switch strings.ToLower(strings.TrimSpace(v)) {
-	case "1", "true", "yes", "on":
-		return true, true
-	case "0", "false", "no", "off":
-		return false, true
-	default:
-		log.Fatalf("invalid boolean in %s", key)
-		return false, false
+		var out int
+		if _, err := fmt.Sscanf(v, "%d", &out); err != nil {
+			log.Fatalf("invalid integer in %s: %v", key, err)
+		}
+		return out, true
 	}
+	return 0, false
+}
+
+func lookupBoolEnv(keys ...string) (bool, bool) {
+	for _, key := range keys {
+		v, ok := os.LookupEnv(key)
+		if !ok || strings.TrimSpace(v) == "" {
+			continue
+		}
+
+		switch strings.ToLower(strings.TrimSpace(v)) {
+		case "1", "true", "yes", "on":
+			return true, true
+		case "0", "false", "no", "off":
+			return false, true
+		default:
+			log.Fatalf("invalid boolean in %s", key)
+		}
+	}
+	return false, false
 }
 
 func validateConfig(cfg Config) error {

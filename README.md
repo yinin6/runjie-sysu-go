@@ -1,4 +1,4 @@
-# runjie-sysu-go
+# ruijie-sysu-go
 
 一个基于 Go 实现的锐捷 802.1X / EAP-MD5 校园网认证工具，目标是做成可配置、可复用、便于二次适配的开源版本。
 
@@ -94,10 +94,10 @@ go run . -config config.json
 PowerShell 示例：
 
 ```powershell
-$env:RUNJIE_DEVICE_NAME="\\Device\\NPF_{YOUR-DEVICE-ID}"
-$env:RUNJIE_USERNAME="your-username"
-$env:RUNJIE_PASSWORD="your-password"
-$env:RUNJIE_LOCAL_MAC="12:34:56:78:9a:bc"
+$env:RUIJIE_DEVICE_NAME="\\Device\\NPF_{YOUR-DEVICE-ID}"
+$env:RUIJIE_USERNAME="your-username"
+$env:RUIJIE_PASSWORD="your-password"
+$env:RUIJIE_LOCAL_MAC="12:34:56:78:9a:bc"
 go run .
 ```
 
@@ -172,14 +172,15 @@ go run . -i "\\Device\\NPF_{YOUR-DEVICE-ID}" -m "12:34:56:78:9a:bc" -logout
 ### 构建
 
 ```bash
-go build -o runjie-go.exe .
+go build -o ruijie-go.exe .
 ```
 
 ### 自动发布
 
 仓库包含 GitHub Actions 工作流：
 
-- 推送 `v*` 标签时自动构建 Windows `amd64` / `arm64` 可执行文件
+- 推送 `v*` 标签时自动构建 Windows `amd64` 可执行文件
+- 推荐使用 `RUIJIE_*` 环境变量，旧的 `RUNJIE_*` 前缀仍兼容
 - 自动把构建产物上传到对应 GitHub Release
 - 支持在 GitHub Actions 页面手动触发
 
