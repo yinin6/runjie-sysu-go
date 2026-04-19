@@ -1,0 +1,13 @@
+{
+  "device_name": "\\Device\\NPF_{YOUR-DEVICE-ID}",
+  "username": "your-username",
+  "password": "your-password",
+  "identity": "",
+  "identity_suffix_hex": "",
+  "local_mac": "12:34:56:78:9a:bc",
+  "start_delay_ms": 0,
+  "retry_delay_ms": 2000,
+  "keepalive_sec": 30,
+  "debug": false,
+  "only_login": true
+}

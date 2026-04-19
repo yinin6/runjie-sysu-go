@@ -1,0 +1,11 @@
+.idea/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+config.json
+config.local.json
+dist/
+build/
